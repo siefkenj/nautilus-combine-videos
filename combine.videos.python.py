@@ -95,15 +95,33 @@ if __name__ == "__main__":
             pass
 
     sizes = [(a['width'], a['height']) for a in processing_info]
-    optimal_size = get_optimal_size(sizes)
+    optimal_size = list(get_optimal_size(sizes))
     fpss = [a['fps'] for a in processing_info]
     optimal_fps = get_optimal_fps(fpss)
 
     # get some user input on the file name
-    QUERY_COMMAND = "zenity --entry".split()
+    QUERY_COMMAND = ["zenity", '--title=Combine Videos', "--forms", 
+            "--text={} files at size {} and fps {}".format(len(sizes), optimal_size, round(float(optimal_fps), 4)),
+            "--add-entry=Output:", 
+            "--add-entry=Override Width ({}):".format(optimal_size[0]), 
+            "--add-entry=Override Height ({}):".format(optimal_size[1]), 
+            "--add-list=Resolutions Found:", "--column-values=Width|Height", "--show-header",
+            "--list-values={}".format("|".join("|".join(str(x) for x in s) for s in set(sizes)))]
     try:
-        out_file_name = subprocess.check_output(QUERY_COMMAND + ['--title=Combine {} files at size {} and fps {} to'.format(len(sizes), optimal_size, optimal_fps)], universal_newlines=True)
+        out = subprocess.check_output(QUERY_COMMAND + ['--title=Combine {} files at size {} and fps {} to'.format(len(sizes), optimal_size, optimal_fps)], universal_newlines=True)
+        # output from zenity --forms is speparated by a "|" character
+        out_file_name, w, h, *_ = out.split("|")
         out_file_name = out_file_name.strip()
+        if not out_file_name:
+            out_file_name = "unnamed_encoded_{}.mkv".format(random.randint(0,100000))
+        try:
+            optimal_size[0] = int(w)
+        except ValueError:
+            pass
+        try:
+            optimal_size[1] = int(h)
+        except ValueError:
+            pass
     except subprocess.CalledProcessError:
         print("User Cancelled")
         sys.exit(1)
