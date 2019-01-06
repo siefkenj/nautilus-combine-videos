@@ -100,11 +100,11 @@ if __name__ == "__main__":
     optimal_fps = get_optimal_fps(fpss)
 
     # get some user input on the file name
-    QUERY_COMMAND = ["zenity", '--title=Combine Videos', "--forms", 
+    QUERY_COMMAND = ["zenity", '--title=Combine Videos', "--forms",
             "--text={} files at size {} and fps {}".format(len(sizes), optimal_size, round(float(optimal_fps), 4)),
-            "--add-entry=Output:", 
-            "--add-entry=Override Width ({}):".format(optimal_size[0]), 
-            "--add-entry=Override Height ({}):".format(optimal_size[1]), 
+            "--add-entry=Output:",
+            "--add-entry=Override Width ({}):".format(optimal_size[0]),
+            "--add-entry=Override Height ({}):".format(optimal_size[1]),
             "--add-list=Resolutions Found:", "--column-values=Width|Height", "--show-header",
             "--list-values={}".format("|".join("|".join(str(x) for x in s) for s in set(sizes)))]
     try:
@@ -168,6 +168,7 @@ if __name__ == "__main__":
         full_command = ['rm', '-rf', TMP_DIR]
         print("  ".join(full_command), "\n***Video Processed***\n")
         subprocess.check_output(full_command)
+        subprocess.check_output(["zenity", "--notification", "--text=Finished encoding '{}'".format(out_file_name)], universal_newlines=True)
 
 
 
