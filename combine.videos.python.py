@@ -13,7 +13,7 @@ import urllib, urllib.parse
 
 try:
     import natsort
-    versort = natsort.versorted
+    versort = natsort.natsorted
 except:
     versort = lambda x: list(sorted(x))
 
